@@ -1,7 +1,7 @@
 package com.example.demokafka;
 
+import com.example.demokafka.interceptor.KafkaInterceptor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 
@@ -29,7 +28,7 @@ class DemoKafkaApplicationTests {
     private static Properties properties;
 
     @BeforeAll
-    static void init(){
+    static void init() {
         properties = new Properties();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, SERVER_ADDR);
     }
@@ -38,9 +37,14 @@ class DemoKafkaApplicationTests {
     void producer() {
         properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        properties.put(ProducerConfig.INTERCEPTOR_CLASSES_CONFIG, Collections.singletonList(KafkaInterceptor.class));
         KafkaProducer<String, String> producer = new KafkaProducer<>(properties);
         try {
-            producer.send(new ProducerRecord<>(VAL_TOPIC, "k1", "hello"));
+            producer.send(new ProducerRecord<>(VAL_TOPIC, "k1", "hello"), (recordMetadata, e) -> {
+                if (e == null) {
+                    log.info("发送成功");
+                }
+            });
         } catch (Exception e) {
             e.printStackTrace();
             log.error("发送消息失败");
@@ -54,7 +58,7 @@ class DemoKafkaApplicationTests {
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.GROUP_ID_CONFIG, "abc");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
-        while (true){
+        while (true) {
             consumer.subscribe(Collections.singletonList(VAL_TOPIC));
             ConsumerRecords<String, String> consumerRecords = consumer.poll(Duration.ofMinutes(1));
             for (ConsumerRecord<String, String> record : consumerRecords) {
@@ -63,6 +67,10 @@ class DemoKafkaApplicationTests {
         }
     }
 
+    @Test
+    void test02(){
+
+    }
 
 
 }
