@@ -23,7 +23,7 @@ import java.util.Properties;
 @SpringBootTest
 class DemoKafkaApplicationTests {
 
-    private static final String SERVER_ADDR = "172.16.250.140:9092";
+    private static final String SERVER_ADDR = "172.16.250.141:9092";
     private static final String VAL_TOPIC = "demo";
     private static Properties properties;
 
@@ -98,9 +98,10 @@ class DemoKafkaApplicationTests {
     void consumerTest() {
         properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "abc");
+        properties.put(ConsumerConfig.GROUP_ID_CONFIG, "demo-kafka01");
         // 关闭自动提交offset
         properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, Boolean.FALSE);
+        properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
         while (true) {
             consumer.subscribe(Collections.singletonList(VAL_TOPIC));
@@ -115,16 +116,16 @@ class DemoKafkaApplicationTests {
             // 同步提交
 //            consumer.commitSync();
             // 异步提交
-            consumer.commitAsync((map, e) -> {
-                if (StringUtils.isEmpty(e)) {
-                    log.info("提交offset成功");
-                    for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
-                        log.info("{}--{}", entry.getKey().partition(), entry.getValue().offset());
-                    }
-                } else {
-                    log.error("提交offset失败");
-                }
-            });
+//            consumer.commitAsync((map, e) -> {
+//                if (StringUtils.isEmpty(e)) {
+//                    log.info("提交offset成功");
+//                    for (Map.Entry<TopicPartition, OffsetAndMetadata> entry : map.entrySet()) {
+//                        log.info("{}--{}", entry.getKey().partition(), entry.getValue().offset());
+//                    }
+//                } else {
+//                    log.error("提交offset失败");
+//                }
+//            });
 
         }
     }

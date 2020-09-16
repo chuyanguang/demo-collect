@@ -1,0 +1,13 @@
+server:
+  port: 8081
+spring:
+  kafka:
+    bootstrap-servers: 172.16.250.141:9092
+    consumer:
+      group-id: demo-kafka
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: false     #手动提交offset
+#      auto-offset-reset: earliest
+    listener:
+      ack-mode: manual
