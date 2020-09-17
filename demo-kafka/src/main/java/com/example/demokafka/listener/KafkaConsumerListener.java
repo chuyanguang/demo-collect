@@ -15,7 +15,7 @@ import java.util.Map;
 @Component
 public class KafkaConsumerListener {
 
-    @KafkaListener(topics = "demo")
+    @KafkaListener(topics = "${kafka.topic}")
     void consumerMsg(ConsumerRecord<String, Object> record, Consumer consumer){
         log.info("{}--{}",record.key(), record.value());
         // 同步提交

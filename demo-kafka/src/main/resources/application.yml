@@ -11,3 +11,4 @@ spring:
 #      auto-offset-reset: earliest
     listener:
       ack-mode: manual
+kafka.topic: demo
